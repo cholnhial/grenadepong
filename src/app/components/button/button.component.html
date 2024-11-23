@@ -1,0 +1,9 @@
+<button class="button text"
+        [ngClass]="{
+        'button__default': color() === 'default',
+        'button__primary': color() === 'primary',
+        'button__secondary': color() === 'secondary',
+        'button__danger': color() === 'danger'
+        }">
+  <ng-content />
+</button>

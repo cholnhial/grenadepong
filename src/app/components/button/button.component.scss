@@ -1,0 +1,29 @@
+@import "variables";
+
+.button {
+  padding: 2rem;
+  border: none;
+  border-radius: 3rem;
+  width: 100%;
+  display: block;
+
+  color: $color-grey-light-1;
+  &__primary {
+    background-color: $color-primary;
+  }
+
+  &__secondary {
+    background-color: $color-secondary-light;
+  }
+
+  &__danger {
+    background-color: $color-danger-dark;
+  }
+
+  &__default {
+    background-color: $color-default;
+    color: $color-grey-dark;
+  }
+
+
+}

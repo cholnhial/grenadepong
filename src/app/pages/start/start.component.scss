@@ -1,0 +1,19 @@
+.container {
+  padding-top: 3rem;
+}
+
+.logo-container {
+  display: grid;
+  place-items: center;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.logo {
+  margin: 0 auto;
+  width: 25rem;
+}

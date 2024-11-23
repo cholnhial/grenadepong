@@ -1,0 +1,19 @@
+@import "variables";
+
+.heading-primary {
+  font-family: "Modak", system-ui;
+  font-weight: 400;
+  font-size: 1.8rem;
+  font-style: normal;
+  letter-spacing: .2rem;
+}
+
+.text-primary {
+  color: $color-primary
+}
+
+.text {
+  font-family: "Barriecito", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}

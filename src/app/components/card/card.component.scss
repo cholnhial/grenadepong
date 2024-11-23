@@ -1,0 +1,8 @@
+@import "variables";
+
+.card {
+  background-color: $color-default;
+  padding: 3rem;
+  box-shadow: 0 1.5rem 4rem rgba($color-black, .15);
+  border-radius: .5rem;
+}
