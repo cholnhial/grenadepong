@@ -9,4 +9,5 @@ import {CommonModule} from '@angular/common';
 })
 export class ButtonComponent {
   color = input<string>('default');
+  disabled = input<boolean>(false);
 }

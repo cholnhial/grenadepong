@@ -1,0 +1,13 @@
+@import "variables";
+
+.game-canvas {
+  height: 80vh;
+  width: 100%;
+  display: block;
+}
+
+.timer {
+  display: block;
+  background-color: $color-grey-light-1;
+  height: 20vh;
+}

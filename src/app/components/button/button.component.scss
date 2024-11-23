@@ -6,6 +6,7 @@
   border-radius: 3rem;
   width: 100%;
   display: block;
+  font-size: 2rem;
 
   color: $color-grey-light-1;
   &__primary {
@@ -23,6 +24,10 @@
   &__default {
     background-color: $color-default;
     color: $color-grey-dark;
+  }
+
+  &:disabled {
+    background-color: lighten($color-primary, 20%);
   }
 
 

@@ -1,0 +1,11 @@
+<div class="container">
+  <div class="logo-container">
+    <img src="/logo.png" alt="Logo" class="logo">
+  </div>
+  <app-card>
+    <form #nameForm=ngForm (ngSubmit)="onSubmit()">
+      <input class="text" name="name" [(ngModel)]="name" required placeholder="NICKNAME" />
+      <app-button [disabled]="!nameForm.valid" color="primary">Start</app-button>
+    </form>
+  </app-card>
+</div>

@@ -1,0 +1,51 @@
+@import "variables";
+
+input {
+  font-size: 1.6rem;  /* 16px */
+  padding: 1.5rem 2rem;
+  width: 100%;
+  border-radius: 2rem;
+  border: 1px solid #999;
+  transition: all 0.3s;
+  margin-bottom: .5rem;
+
+  &::placeholder {
+    color: #999;
+  }
+
+  &:focus:valid {
+    border-bottom: 3px solid #55c57a;
+  }
+
+  &:focus:invalid {
+    border-bottom: 3px solid #ff7730;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 1rem 2rem rgba($color-black, .1);
+    border-bottom: 3px solid $color-primary;
+  }
+}
+
+
+
+.container {
+  padding: 3rem;
+}
+
+.logo-container {
+  display: grid;
+  place-items: center;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.logo {
+  margin: 0 auto;
+  width: 25rem;
+}
