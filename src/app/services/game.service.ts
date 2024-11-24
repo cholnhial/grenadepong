@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import Peer, { DataConnection } from 'peerjs';
+
 
 @Injectable({
   providedIn: 'root'
@@ -6,4 +8,6 @@ import { Injectable } from '@angular/core';
 export class GameService {
 
   constructor() { }
+
+
 }

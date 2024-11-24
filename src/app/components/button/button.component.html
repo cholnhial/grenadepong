@@ -1,5 +1,6 @@
 <button class="button text"
         [disabled]="disabled()"
+        (click)="onClick()"
         [ngClass]="{
         'button__default': color() === 'default',
         'button__primary': color() === 'primary',

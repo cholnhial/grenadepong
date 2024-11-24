@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 
 @Component({
@@ -10,4 +10,9 @@ import {CommonModule} from '@angular/common';
 export class ButtonComponent {
   color = input<string>('default');
   disabled = input<boolean>(false);
+  click = output<void>();
+
+  onClick() {
+    this.click.emit();
+  }
 }

@@ -1,0 +1,10 @@
+<div class="container">
+  <div class="logo-container">
+    <img src="/logo.png" alt="Logo" class="logo">
+  </div>
+  <div class="qr-code">
+    <img [src]="(qrCodeBase64$ | async) ?? ''" />
+  </div>
+  <p class="text help-text text-primary">Get the other player to scan the QR to join your game</p>
+  <app-button color="danger">END GAME</app-button>
+</div>

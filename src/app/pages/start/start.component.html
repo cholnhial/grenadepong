@@ -4,8 +4,8 @@
   </div>
 <app-card>
   <div class="buttons">
-    <app-button [routerLink]="['/name']" color="primary">New Game</app-button>
-    <app-button color="secondary">Join</app-button>
+    <app-button (click)="onCreateNew()" color="primary">New Game</app-button>
+    <app-button (click)="onJoin()" color="secondary">Join</app-button>
   </div>
 </app-card>
 </div>
