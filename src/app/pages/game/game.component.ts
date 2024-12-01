@@ -51,11 +51,11 @@ import {generatePeerId} from '../../utils';
 
 
 enum GameMessageType {
-  START_TIMER,
-  EXPLOSION,
-  GAME_OVER,
-  HELLO,
-  GRENADE_INCOMING
+  START_TIMER = 'START_TIMER',
+  EXPLOSION = 'EXPLOSION',
+  GAME_OVER = 'GAME_OVER',
+  HELLO = 'HELLO',
+  GRENADE_INCOMING = 'GRENADE_INCOMING'
 }
 
 interface GameMessage {
@@ -88,6 +88,7 @@ export class GameComponent implements OnInit {
   private readonly gameCanvas = viewChild<ElementRef>('gameCanvas');
   private app?: PIXI.Application;
   private grenades: Array<Grenade> = [];
+  private grenadeTexture!: PIXI.Texture;
   private isHost = false;
 
   // Physics constants
@@ -108,6 +109,10 @@ export class GameComponent implements OnInit {
     Assets.add({ alias: 'grenade', src: 'grenade.png' });
   }
 
+  async loadTextures() {
+    this.grenadeTexture = await  Assets.load('grenade');
+  }
+
   async ngOnInit() {
     const canvasElement = this.gameCanvas();
     if (canvasElement) {
@@ -115,32 +120,45 @@ export class GameComponent implements OnInit {
       await this.app.init({ resizeTo: canvasElement.nativeElement });
       this.gameCanvas()?.nativeElement?.appendChild(this.app.canvas);
       this.configureAssets();
+      await this.loadTextures();
       await this.initBackground();
-      await this.loadGrenade();
+
       this.app.ticker.add(this.gameLoop.bind(this));
     }
     if (localStorage.getItem('mode') && localStorage.getItem('mode') === 'host') {
       this.isHost = true;
+     // only load grenades for host
+      await this.loadGrenades();
     }
-
     if (localStorage.getItem('mode') && localStorage.getItem('mode') === 'joining') {
       console.log("Joining",  localStorage.getItem('hostPeerId'));
+      this.peerService.getOnConnectedToHost().subscribe(() => {
+        this.peerService.sendData('hello');
+      });
       this.peerService.init(generatePeerId(), localStorage.getItem('hostPeerId')!, false);
-      setTimeout(() => {
-        this.peerService.sendData('Hello');
-      }, 3000);
 
+    }
+    this.peerService.getOnDataSubject().subscribe(this.handleOnPeerData.bind(this));
+  }
+
+  handleOnPeerData(data: GameMessage) {
+    if (this.isHost) {
+      console.log("HOST: ", data);
+    } else {
+      console.log("CLIENT: ", data);
+    }
+
+    if (data.type == GameMessageType.GRENADE_INCOMING) {
+      this.handleIncomingGrenadeMessage(data);
     }
   }
 
-  handleOnPeerData(data: any) {
-
-  }
-
-  handleOffscreenGrenade(grenade: Grenade) {
+  private handleOffscreenGrenade(grenade: Grenade) {
     if (!grenade.isOffscreen) {
-      console.log('Grenade has gone off screen!');
       grenade.isOffscreen = true;
+      grenade.lastPosition.x = grenade.sprite.x;
+      grenade.lastPosition.y = grenade.sprite.y;
+      this.sendGrenadeIncomingToPeer(grenade);
       // Remove from stage
       this.app?.stage.removeChild(grenade.sprite);
       // Remove from grenades array
@@ -149,6 +167,29 @@ export class GameComponent implements OnInit {
         this.grenades.splice(index, 1);
       }
     }
+  }
+
+  private sendGrenadeIncomingToPeer(grenade: Grenade) {
+    const payload: GameMessage = {type: GameMessageType.GRENADE_INCOMING, payload: {
+        peerScreenHeight: this.app?.screen.height,
+        peerScreenWidth:  this.app?.screen.width,
+        lastPosition: grenade.lastPosition,
+        velocity: grenade.velocity
+      }};
+    this.peerService.sendData(payload);
+  }
+
+  private handleIncomingGrenadeMessage(message: GameMessage) {
+    const grenade = new Sprite(this.grenadeTexture);
+    grenade.anchor.set(0.5);
+    grenade.scale.set(0.3);
+    grenade.zIndex = 3;
+    grenade.x = this.app!.screen.width*(message.payload.lastPosition.x/message.payload.peerScreenWidth);
+    grenade.y = 0;
+    grenade.eventMode = 'static';
+    grenade.cursor = 'pointer';
+    this.app!.stage.addChild(grenade);
+    this.addGrenade(grenade);
   }
 
   gameLoop() {
@@ -200,14 +241,14 @@ export class GameComponent implements OnInit {
     });
   }
 
-  addGrenade(sprite: PIXI.Sprite) {
+  addGrenade(sprite: PIXI.Sprite, withVelocity =  {x: 0, y: 0}) {
     const grenade = {
       sprite,
       isDragging: false,
       dragOffset: {x: 0, y: 0},
       lastPosition: {x: 0, y: 0},
       dragStartTime: 0,
-      velocity: {x: 0, y: 0},
+      velocity: withVelocity,
       positionHistory: [],
       isOffscreen: false
     };
@@ -289,32 +330,29 @@ export class GameComponent implements OnInit {
     return {x: velocityX, y: velocityY};
   }
 
-  async loadGrenade() {
-    Assets.load('grenade').then((texture) => {
-      const grenade = new Sprite(texture);
-      grenade.anchor.set(0.5);
-      grenade.scale.set(0.3);
-      grenade.zIndex = 3;
-      grenade.x = this.app!.screen.width / 2;
-      grenade.y = this.app!.screen.height / 2;
-      grenade.eventMode = 'static';
-      grenade.cursor = 'pointer';
-      this.app!.stage.addChild(grenade);
-      this.addGrenade(grenade);
-    });
 
-    Assets.load('grenade').then((texture) => {
-      const grenade = new Sprite(texture);
-      grenade.anchor.set(0.5);
-      grenade.scale.set(0.3);
-      grenade.zIndex = 3;
-      grenade.x = this.app!.screen.width / 2;
-      grenade.y = this.app!.screen.height / 3;
-      grenade.eventMode = 'static';
-      grenade.cursor = 'pointer';
-      this.app!.stage.addChild(grenade);
-      this.addGrenade(grenade);
-    });
+  async loadGrenades() {
+    let grenade = new Sprite(this.grenadeTexture);
+    grenade.anchor.set(0.5);
+    grenade.scale.set(0.3);
+    grenade.zIndex = 3;
+    grenade.x = this.app!.screen.width / 2;
+    grenade.y = this.app!.screen.height / 2;
+    grenade.eventMode = 'static';
+    grenade.cursor = 'pointer';
+    this.app!.stage.addChild(grenade);
+    this.addGrenade(grenade);
+    // Add second grenade
+    grenade = new Sprite(this.grenadeTexture);
+    grenade.anchor.set(0.5);
+    grenade.scale.set(0.3);
+    grenade.zIndex = 3;
+    grenade.x = this.app!.screen.width / 2;
+    grenade.y = this.app!.screen.height / 3;
+    grenade.eventMode = 'static';
+    grenade.cursor = 'pointer';
+    this.app!.stage.addChild(grenade);
+    this.addGrenade(grenade);
   }
 
   async initBackground() {

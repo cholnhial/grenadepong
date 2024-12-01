@@ -19,11 +19,13 @@ export class WaitComponent implements OnInit {
   }
 
   qrCodeBase64$!: Observable<string>;
+  joiningId!: string | null;
 
   async ngOnInit() {
 
     if (localStorage.getItem('mode') && localStorage.getItem('mode') === 'host') {
       const peerId =  localStorage.getItem('hostPeerId');
+      this.joiningId = peerId;
       this.peerService.init(peerId!);
       this.qrCodeBase64$ = this.qrCodeService.generateQrCode(`http://192.168.1.106:4200/name?host-peer-id=${peerId}`);
       console.log(`http://192.168.1.106:4200/name?host-peer-id=${peerId}`);

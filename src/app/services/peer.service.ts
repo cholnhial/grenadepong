@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import Peer, {DataConnection} from 'peerjs';
-import {Observable, Subject} from 'rxjs';
+import {EMPTY, Observable, Subject} from 'rxjs';
 
 
 @Injectable({
@@ -40,7 +40,6 @@ export class PeerService {
         console.log("Connection");
         this.connections.push(conn);
         conn.on('data', (data) => {
-          console.log(data);
           this.onData.next(data);
         });
         conn.on('close', () => {
@@ -57,7 +56,8 @@ export class PeerService {
         this.peerConnection = this.peer.connect(hostPeerId);
 
         this.peerConnection.on('open', () => {
-          console.log("CONNECTION MADE");
+          this.onConnectedToHost.next('');
+          console.log("Connection made to host");
         });
 
         this.peerConnection.on('data', (data) => {
@@ -97,6 +97,10 @@ export class PeerService {
 
   getOnDataSubject() {
     return this.onData;
+  }
+
+  getOnConnectedToHost() {
+    return this.onConnectedToHost;
   }
 
   getOnConnectionClosedSubject() {
