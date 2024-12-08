@@ -27,7 +27,7 @@ export class WaitComponent implements OnInit {
       const peerId =  localStorage.getItem('hostPeerId');
       this.joiningId = peerId;
       this.peerService.init(peerId!);
-      this.qrCodeBase64$ = this.qrCodeService.generateQrCode(`http://192.168.1.106:4200/name?host-peer-id=${peerId}`);
+      this.qrCodeBase64$ = this.qrCodeService.generateQrCode(`http://192.168.1.110:4200/name?host-peer-id=${peerId}`);
       console.log(`http://192.168.1.106:4200/name?host-peer-id=${peerId}`);
       this.peerService.getOnDataSubject().subscribe((data) => {
         console.log(data);

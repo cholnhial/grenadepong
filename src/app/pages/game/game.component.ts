@@ -2,9 +2,15 @@ import {Component, DestroyRef, effect, ElementRef, inject, OnInit, viewChild, Vi
 import * as PIXI from 'pixi.js';
 import {Application, Assets, Sprite} from 'pixi.js';
 import {PeerService} from '../../services/peer.service';
-import {generatePeerId} from '../../utils';
+import {generatePeerId, isPlayerHost, isPlayerJoining} from '../../utils';
 
 /***
+
+
+ - 4 animations of explosions.
+
+ - Each Animation Atlas frame is a 512 x 512 size image (4096 x 4096 total). Included half sized version as well (2048 x 2048 total).
+
 
  - Both grenades explode on one screen => GAME OVER
  - a player has one grenade explode
@@ -73,6 +79,7 @@ interface Grenade {
   dragStartTime: number;
   positionHistory: Array<{x: number, y: number, time: number}>;
   isOffscreen: boolean; // Track if grenade is off screen
+  explosionAnimation: PIXI.AnimatedSprite;
 }
 
 @Component({
@@ -89,6 +96,7 @@ export class GameComponent implements OnInit {
   private app?: PIXI.Application;
   private grenades: Array<Grenade> = [];
   private grenadeTexture!: PIXI.Texture;
+  private explosionAnimationTexture!: PIXI.Texture;
   private isHost = false;
 
   // Physics constants
@@ -111,6 +119,78 @@ export class GameComponent implements OnInit {
 
   async loadTextures() {
     this.grenadeTexture = await  Assets.load('grenade');
+    this.explosionAnimationTexture = await  Assets.load('explosion');
+  }
+
+  getExplosionAnimationSpriteSheetData() {
+
+    const spriteSheetData:PIXI.SpritesheetData = {
+      frames: {},
+      meta: {
+        scale: '1'
+      }
+    };
+
+    const totalWidth = 4096;
+    const totalHeight = 4096;
+    const frameWidth = 512;
+    const frameHeight = 512;
+    const framesPerRow = totalWidth / frameWidth;
+    const framesPerColumn = totalHeight / frameHeight;
+    const totalFrames = framesPerRow * framesPerColumn;
+
+    for (let i = 0; i < totalFrames; i++) {
+      const row = Math.floor(i / framesPerRow);
+      const col = i % framesPerRow;
+
+      spriteSheetData.frames[`frame_${i}`] = {
+        frame: {
+          x: col * frameWidth,
+          y: row * frameHeight,
+          w: frameWidth,
+          h: frameHeight
+        },
+        sourceSize: {
+          w: frameWidth,
+          h: frameHeight
+        }
+      };
+    }
+
+    return spriteSheetData;
+  }
+
+  async getExplosionAnimationSprite() {
+    const spritesheet = new PIXI.Spritesheet(
+      this.explosionAnimationTexture,
+      this.getExplosionAnimationSpriteSheetData()
+    );
+
+    return spritesheet.parse().then(() => {
+      // Create an animated sprite
+       const explosionAnimation = new PIXI.AnimatedSprite(
+        Object.values(spritesheet.textures)
+      );
+
+      // Configure the animation
+      explosionAnimation.animationSpeed = 0.5; // Adjust speed (e.g., 0.5 = 30 fps at 60 fps)
+      explosionAnimation.loop = false; // Set to false if you want it to play once
+
+      return explosionAnimation;
+    });
+  }
+
+  async playGrenadeExplosion(grenade: Grenade) {
+    this.app!.stage.removeChild(grenade.sprite);
+    grenade.explosionAnimation.anchor.set(0.5);
+    grenade.explosionAnimation.scale = 3;
+    grenade.explosionAnimation.x = grenade.sprite.x;
+    grenade.explosionAnimation.y = grenade.sprite.y;
+    grenade.explosionAnimation.play();
+    grenade.explosionAnimation.onComplete = () => {
+      this.app!.stage.removeChild(grenade.explosionAnimation);
+    }
+    this.app!.stage.addChild(grenade.explosionAnimation);
   }
 
   async ngOnInit() {
@@ -125,14 +205,20 @@ export class GameComponent implements OnInit {
 
       this.app.ticker.add(this.gameLoop.bind(this));
     }
-    if (localStorage.getItem('mode') && localStorage.getItem('mode') === 'host') {
+    setTimeout(() => {
+      this.grenades.filter(g => !g.isOffscreen).forEach(g => {
+       this.playGrenadeExplosion(g);
+      })
+    }, 10000);
+    if (isPlayerHost()) {
       this.isHost = true;
      // only load grenades for host
       await this.loadGrenades();
     }
-    if (localStorage.getItem('mode') && localStorage.getItem('mode') === 'joining') {
+    if (isPlayerJoining()) {
       console.log("Joining",  localStorage.getItem('hostPeerId'));
       this.peerService.getOnConnectedToHost().subscribe(() => {
+        console.log('CLIENT: CONNECTED');
         this.peerService.sendData('hello');
       });
       this.peerService.init(generatePeerId(), localStorage.getItem('hostPeerId')!, false);
@@ -241,7 +327,7 @@ export class GameComponent implements OnInit {
     });
   }
 
-  addGrenade(sprite: PIXI.Sprite, withVelocity =  {x: 0, y: 0}) {
+  async addGrenade(sprite: PIXI.Sprite, withVelocity =  {x: 0, y: 0}) {
     const grenade = {
       sprite,
       isDragging: false,
@@ -250,7 +336,8 @@ export class GameComponent implements OnInit {
       dragStartTime: 0,
       velocity: withVelocity,
       positionHistory: [],
-      isOffscreen: false
+      isOffscreen: false,
+      explosionAnimation: await this.getExplosionAnimationSprite()
     };
 
     this.grenades?.push(grenade);
