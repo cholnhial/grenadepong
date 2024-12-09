@@ -1,0 +1,10 @@
+@import "variables";
+
+.timer {
+  display: block;
+  background-color: $color-grey-light-1;
+  height: 20vh;
+  text-align: center;
+  font-size: 2rem;
+  color: green;
+}

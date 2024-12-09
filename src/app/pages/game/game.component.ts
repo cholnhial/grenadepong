@@ -1,8 +1,14 @@
-import {Component, DestroyRef, effect, ElementRef, inject, OnInit, viewChild, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, viewChild} from '@angular/core';
 import * as PIXI from 'pixi.js';
 import {Application, Assets, Sprite} from 'pixi.js';
 import {PeerService} from '../../services/peer.service';
-import {generatePeerId, isPlayerHost, isPlayerJoining} from '../../utils';
+import {generatePeerId} from '../../utils';
+import {GameService} from '../../services/game.service';
+import {GameMessage, GameMessageType} from '../../models/game-message';
+import {Grenade} from '../../models/grenade';
+import {PlayerMode} from '../../models/player';
+import {TimerComponent} from '../../components/timer/timer.component';
+import {TimerService} from '../../services/timer.service';
 
 /***
 
@@ -56,41 +62,19 @@ import {generatePeerId, isPlayerHost, isPlayerJoining} from '../../utils';
  **/
 
 
-enum GameMessageType {
-  START_TIMER = 'START_TIMER',
-  EXPLOSION = 'EXPLOSION',
-  GAME_OVER = 'GAME_OVER',
-  HELLO = 'HELLO',
-  GRENADE_INCOMING = 'GRENADE_INCOMING'
-}
 
-interface GameMessage {
-  type: GameMessageType;
-  payload: any;
-}
-
-
-interface Grenade {
-  sprite: PIXI.Sprite;
-  isDragging: boolean;
-  dragOffset: {x: number, y: number};
-  velocity: {x: number, y: number};
-  lastPosition: {x: number, y: number};
-  dragStartTime: number;
-  positionHistory: Array<{x: number, y: number, time: number}>;
-  isOffscreen: boolean; // Track if grenade is off screen
-  explosionAnimation: PIXI.AnimatedSprite;
-}
 
 @Component({
   selector: 'app-game',
-  imports: [],
+  imports: [TimerComponent],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })
 export class GameComponent implements OnInit {
 
-  constructor(private peerService: PeerService) {
+  constructor(private peerService: PeerService,
+              private timerService: TimerService,
+              private gameService: GameService) {
   }
   private readonly gameCanvas = viewChild<ElementRef>('gameCanvas');
   private app?: PIXI.Application;
@@ -111,8 +95,7 @@ export class GameComponent implements OnInit {
   private readonly OFFSCREEN_MARGIN = 100; // How far past the screen edge before removing
 
   configureAssets() {
-    const randomBackgroundNumber = Math.floor(Math.random() * 4) + 1;
-    Assets.add({ alias: 'background', src: `background${randomBackgroundNumber}.jpeg` });
+    Assets.add({ alias: 'background', src: `background${this.gameService.getRandomBackgroundIndex()}.jpeg` });
     Assets.add({ alias: 'explosion', src: 'explosion.png' });
     Assets.add({ alias: 'grenade', src: 'grenade.png' });
   }
@@ -205,37 +188,64 @@ export class GameComponent implements OnInit {
 
       this.app.ticker.add(this.gameLoop.bind(this));
     }
-    setTimeout(() => {
-      this.grenades.filter(g => !g.isOffscreen).forEach(g => {
-       this.playGrenadeExplosion(g);
-      })
-    }, 10000);
-    if (isPlayerHost()) {
+    if (this.gameService.getMode() == PlayerMode.HOSTING) {
       this.isHost = true;
      // only load grenades for host
       await this.loadGrenades();
+      this.sendHostReady();
     }
-    if (isPlayerJoining()) {
-      console.log("Joining",  localStorage.getItem('hostPeerId'));
+    if (this.gameService.getMode() == PlayerMode.JOINING) {
       this.peerService.getOnConnectedToHost().subscribe(() => {
-        console.log('CLIENT: CONNECTED');
-        this.peerService.sendData('hello');
+        this.sendHello(); // joining player is connected
       });
-      this.peerService.init(generatePeerId(), localStorage.getItem('hostPeerId')!, false);
+      this.peerService.init(generatePeerId(), this.gameService.getHostPeerId(), false);
 
     }
+    this.timerService.setTimeLimitInSecs(30); // 30 seconds
+    this.timerService.setOnTimeout(() => {
+      this.grenades.forEach(g => {
+        this.playGrenadeExplosion(g);
+        /**
+         * Check who wins
+         *
+         * Scenarios:
+         *
+         * 1. I have one of the grenades => DRAW
+         * 2. I have both grenades => I LOSE
+         * 3. I don't have any grenades => I WIN
+         */
+      })
+    });
+
     this.peerService.getOnDataSubject().subscribe(this.handleOnPeerData.bind(this));
   }
 
-  handleOnPeerData(data: GameMessage) {
+  async handleOnPeerData(data: GameMessage) {
+
     if (this.isHost) {
-      console.log("HOST: ", data);
+      switch (data.type) {
+        case GameMessageType.GUEST_READY:
+          // The other player has connected
+          this.gameService.setOtherPlayerName(data.payload.name);
+          this.timerService.start();
+          this.sendStart();
+          break;
+      }
     } else {
-      console.log("CLIENT: ", data);
+      switch (data.type) {
+        case GameMessageType.START:
+          this.timerService.start();
+          break;
+        case GameMessageType.HOST_READY:
+          this.sendGuestReady();
+          this.gameService.setOtherPlayerName(data.payload.name);
+          break;
+      }
     }
 
+     // Common handlers
     if (data.type == GameMessageType.GRENADE_INCOMING) {
-      this.handleIncomingGrenadeMessage(data);
+      await this.handleIncomingGrenadeMessage(data);
     }
   }
 
@@ -265,7 +275,36 @@ export class GameComponent implements OnInit {
     this.peerService.sendData(payload);
   }
 
-  private handleIncomingGrenadeMessage(message: GameMessage) {
+  private sendHello() {
+    const payload: GameMessage = {type: GameMessageType.HELLO, payload: {
+
+      }};
+    this.peerService.sendData(payload);
+  }
+
+  private sendStart() {
+    const payload: GameMessage = {type: GameMessageType.START, payload: {
+
+      }};
+    this.peerService.sendData(payload);
+  }
+
+  private sendHostReady() {
+    const payload: GameMessage = {type: GameMessageType.HOST_READY,
+      payload: {
+        name: this.gameService.getPlayerName()
+      }};
+    this.peerService.sendData(payload);
+  }
+
+  private sendGuestReady() {
+    const payload: GameMessage = {type: GameMessageType.GUEST_READY, payload: {
+        name: this.gameService.getPlayerName()
+      }};
+    this.peerService.sendData(payload);
+  }
+
+  private async handleIncomingGrenadeMessage(message: GameMessage) {
     const grenade = new Sprite(this.grenadeTexture);
     grenade.anchor.set(0.5);
     grenade.scale.set(0.3);
@@ -275,7 +314,7 @@ export class GameComponent implements OnInit {
     grenade.eventMode = 'static';
     grenade.cursor = 'pointer';
     this.app!.stage.addChild(grenade);
-    this.addGrenade(grenade);
+    await this.addGrenade(grenade);
   }
 
   gameLoop() {

@@ -4,6 +4,8 @@ import {CommonModule} from '@angular/common';
 import {CardComponent} from '../../components/card/card.component';
 import {ButtonComponent} from '../../components/button/button.component';
 import {ActivatedRoute, Router} from '@angular/router';
+import {GameService } from '../../services/game.service';
+import {PlayerMode} from '../../models/player';
 
 @Component({
   selector: 'app-name',
@@ -16,22 +18,29 @@ export class NameComponent implements OnInit {
   name = signal('');
   isJoining = false;
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(private route: ActivatedRoute,
+              private gameService: GameService,
+              private router: Router) {}
 
   ngOnInit() {
-    const param = this.route.snapshot.queryParamMap.get('host-peer-id');
-    if (param) {
-      localStorage.setItem('hostPeerId', param);
+    const hostPeerId = this.route.snapshot.queryParamMap.get('host-peer-id');
+    const backgroundIndex = this.route.snapshot.queryParamMap.get('background-index');
+    if (hostPeerId) {
+      this.gameService.setHostPeerId(hostPeerId);
+      this.gameService.setMode(PlayerMode.JOINING);
       this.isJoining = true;
+    }
+    if (backgroundIndex) {
+      this.gameService.setRandomBackgroundIndex(Number.parseInt(backgroundIndex));
     }
   }
 
   async onSubmit() {
-    localStorage.setItem('name', this.name());
-    if (!this.isJoining) {
+    this.gameService.setPlayerName(this.name());
+    if (this.gameService.getMode() != PlayerMode.JOINING) {
       await this.router.navigate(['/wait']);
     } else {
-      localStorage.setItem('mode', 'joining');
+      this.gameService.setMode(PlayerMode.JOINING)
       await this.router.navigate(['/game']);
     }
 

@@ -1,1 +1,3 @@
-<p>timer works!</p>
+<div class="timer">
+  {{ timerService.countdownObservable() | async }}
+</div>

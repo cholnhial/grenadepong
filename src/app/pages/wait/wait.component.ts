@@ -6,6 +6,9 @@ import {ButtonComponent} from '../../components/button/button.component';
 import {CommonModule} from '@angular/common';
 import {PeerService} from '../../services/peer.service';
 import {Router} from '@angular/router';
+import {GameService} from '../../services/game.service';
+import {GameMessage, GameMessageType} from '../../models/game-message';
+import {generatePeerId} from '../../utils';
 
 @Component({
   selector: 'app-wait',
@@ -15,7 +18,10 @@ import {Router} from '@angular/router';
 })
 export class WaitComponent implements OnInit {
 
-  constructor(private router: Router, private qrCodeService: QrCodeService, private peerService: PeerService) {
+  constructor(private router: Router,
+              private qrCodeService: QrCodeService,
+              private gameService: GameService,
+              private peerService: PeerService) {
   }
 
   qrCodeBase64$!: Observable<string>;
@@ -27,11 +33,16 @@ export class WaitComponent implements OnInit {
       const peerId =  localStorage.getItem('hostPeerId');
       this.joiningId = peerId;
       this.peerService.init(peerId!);
-      this.qrCodeBase64$ = this.qrCodeService.generateQrCode(`http://192.168.1.110:4200/name?host-peer-id=${peerId}`);
-      console.log(`http://192.168.1.106:4200/name?host-peer-id=${peerId}`);
-      this.peerService.getOnDataSubject().subscribe((data) => {
-        console.log(data);
-        this.router.navigate(['/game']);
+
+      const backgroundIndex = this.gameService.getRandomBackgroundIndex();
+      const url = `http://192.168.1.110:4200/name?host-peer-id=${peerId}&background-index=${backgroundIndex}`;
+      this.qrCodeBase64$ = this.qrCodeService.generateQrCode(url);
+      console.log(url);
+      this.peerService.getOnDataSubject().subscribe((data: GameMessage) => {
+        if (data.type == GameMessageType.HELLO) {
+          this.router.navigate(['/game']); // peer has connected start game
+        }
+
       })
     }
   }
