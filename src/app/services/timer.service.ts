@@ -30,6 +30,8 @@ export class TimerService {
         if (this.timeoutCallback) {
           this.timeoutCallback();
           this.stop();
+        } else {
+          throw new Error("Timeout callback not set");
         }
       }
       this.secondsRemaining -= 1;
@@ -38,7 +40,6 @@ export class TimerService {
   }
 
   stop() {
-    this.secondsRemaining = this.timeLimit;
     clearTimeout(this.intervalInstance);
     this.running = false;
   }
