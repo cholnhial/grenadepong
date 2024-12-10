@@ -31,5 +31,5 @@ jobs:
       # Step 5: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npx angular-cli-ghpages --repo=https://github.com/cholnhial/grenadepong.git --no-silent --dir=dist/browser --name="Chol Nhial" --email=chol.nhial.chol@gmail.com
