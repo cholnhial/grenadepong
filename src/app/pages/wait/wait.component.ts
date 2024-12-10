@@ -35,7 +35,7 @@ export class WaitComponent implements OnInit {
       this.peerService.init(peerId!);
 
       const backgroundIndex = this.gameService.getRandomBackgroundIndex();
-      const url = `http://192.168.1.110:4200/#name?host-peer-id=${peerId}&background-index=${backgroundIndex}`;
+      const url = `https://cholnhial.github.io/grenadepong/#name?host-peer-id=${peerId}&background-index=${backgroundIndex}`;
       this.qrCodeBase64$ = this.qrCodeService.generateQrCode(url);
       console.log(url);
       this.peerService.getOnDataSubject().subscribe((data: GameMessage) => {
