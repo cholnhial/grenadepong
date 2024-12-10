@@ -8,7 +8,7 @@ import {PeerService} from '../../services/peer.service';
 import {Router} from '@angular/router';
 import {GameService} from '../../services/game.service';
 import {GameMessage, GameMessageType} from '../../models/game-message';
-import {generatePeerId} from '../../utils';
+import {PlayerMode} from '../../models/player';
 
 @Component({
   selector: 'app-wait',
@@ -29,8 +29,8 @@ export class WaitComponent implements OnInit {
 
   async ngOnInit() {
 
-    if (localStorage.getItem('mode') && localStorage.getItem('mode') === 'host') {
-      const peerId =  localStorage.getItem('hostPeerId');
+    if (this.gameService.getMode() === PlayerMode.HOSTING) {
+      const peerId =  this.gameService.getHostPeerId();
       this.joiningId = peerId;
       this.peerService.init(peerId!);
 
