@@ -3,7 +3,8 @@ export enum GameMessageType {
   HOST_READY = 'HOST_READY',
   GUEST_READY = 'GUEST_READY',
   HELLO = 'HELLO',
-  GRENADE_INCOMING = 'GRENADE_INCOMING'
+  GRENADE_INCOMING = 'GRENADE_INCOMING',
+  RESTART = 'RESTART'
 }
 
 export interface GameMessage {

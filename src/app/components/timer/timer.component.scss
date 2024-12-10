@@ -1,11 +1,13 @@
 @import "variables";
 
 .timer {
-  display: block;
-  margin-top: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
   background-color: $color-grey-light-1;
   height: 20vh;
-  text-align: center;
+  max-height: 20vh;
   font-family: "Press Start 2P", system-ui;
   font-weight: 400;
   font-size: 3rem;

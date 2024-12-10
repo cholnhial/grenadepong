@@ -1,6 +1,7 @@
 @import "variables";
 
 .game-canvas {
+  max-height: 80vh;
   height: 80vh;
   width: 100%;
   display: block;

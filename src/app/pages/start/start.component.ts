@@ -25,7 +25,7 @@ export class StartComponent {
     await this.router.navigate(['/name']);
   }
 
-  async onJoin() {
+  async onGitHub() {
     await this.router.navigate(['/name']);
   }
 }

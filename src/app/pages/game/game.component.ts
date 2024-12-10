@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, viewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, Renderer2, viewChild} from '@angular/core';
 import * as PIXI from 'pixi.js';
 import {Application, Assets, Sprite} from 'pixi.js';
 import {PeerService} from '../../services/peer.service';
@@ -6,9 +6,10 @@ import {generatePeerId} from '../../utils';
 import {GameService} from '../../services/game.service';
 import {GameMessage, GameMessageType} from '../../models/game-message';
 import {Grenade} from '../../models/grenade';
-import {PlayerMode} from '../../models/player';
+import {PlayerMode, ScoreStatus} from '../../models/player';
 import {TimerComponent} from '../../components/timer/timer.component';
 import {TimerService} from '../../services/timer.service';
+import {Router} from '@angular/router';
 
 /***
 
@@ -70,14 +71,16 @@ import {TimerService} from '../../services/timer.service';
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })
-export class GameComponent implements OnInit {
+export class GameComponent implements OnInit, OnDestroy {
 
   constructor(private peerService: PeerService,
               private timerService: TimerService,
+              private router: Router,
+              private renderer: Renderer2,
               private gameService: GameService) {
   }
   private readonly gameCanvas = viewChild<ElementRef>('gameCanvas');
-  private app?: PIXI.Application;
+  private app?: PIXI.Application | null;
   private grenades: Array<Grenade> = [];
   private grenadeTexture!: PIXI.Texture;
   private explosionAnimationTexture!: PIXI.Texture;
@@ -180,7 +183,13 @@ export class GameComponent implements OnInit {
     const canvasElement = this.gameCanvas();
     if (canvasElement) {
       this.app = new Application();
-      await this.app.init({ resizeTo: canvasElement.nativeElement });
+      if (!this.gameService.getIsRestart()) {
+        await this.app.init({ resizeTo: canvasElement.nativeElement });
+        this.gameService.setCanvasHeight(this.app!.screen.height);
+        this.gameService.setCanvasWidth(this.app!.screen.width);
+      } else {
+        await this.app.init({ width: this.gameService.getCanvasWidth(), height: this.gameService.getCanvasHeight() });
+      }
       this.gameCanvas()?.nativeElement?.appendChild(this.app.canvas);
       this.configureAssets();
       await this.loadTextures();
@@ -198,7 +207,9 @@ export class GameComponent implements OnInit {
       this.peerService.getOnConnectedToHost().subscribe(() => {
         this.sendHello(); // joining player is connected
       });
-      this.peerService.init(generatePeerId(), this.gameService.getHostPeerId(), false);
+      if (!this.gameService.getIsRestart()) {
+        this.peerService.init(generatePeerId(), this.gameService.getHostPeerId(), false);
+      }
 
     }
     this.timerService.setTimeLimitInSecs(30); // 30 seconds
@@ -215,6 +226,17 @@ export class GameComponent implements OnInit {
          * 3. I don't have any grenades => I WIN
          */
       })
+      if(this.grenades.length == 1) {
+        this.gameService.setScoreStatus(ScoreStatus.DRAW);
+      }
+      else if (this.grenades.length == 2) {
+        this.gameService.setScoreStatus(ScoreStatus.LOSE);
+      } else {
+        this.gameService.setScoreStatus(ScoreStatus.WIN)
+      }
+     setTimeout(() => {
+       this.router.navigate(['score']);
+     }, 3000);
     });
 
     this.peerService.getOnDataSubject().subscribe(this.handleOnPeerData.bind(this));
@@ -227,14 +249,22 @@ export class GameComponent implements OnInit {
         case GameMessageType.GUEST_READY:
           // The other player has connected
           this.gameService.setOtherPlayerName(data.payload.name);
-          this.timerService.start();
+          if (!this.gameService.getIsRestart()) {
+            this.timerService.start();
+          } else {
+            this.timerService.reset();
+          }
           this.sendStart();
           break;
       }
     } else {
       switch (data.type) {
         case GameMessageType.START:
-          this.timerService.start();
+          if (!this.gameService.getIsRestart()) {
+            this.timerService.start();
+          } else {
+            this.timerService.reset();
+          }
           break;
         case GameMessageType.HOST_READY:
           this.sendGuestReady();
@@ -478,7 +508,7 @@ export class GameComponent implements OnInit {
     grenade.eventMode = 'static';
     grenade.cursor = 'pointer';
     this.app!.stage.addChild(grenade);
-    this.addGrenade(grenade);
+    await this.addGrenade(grenade);
   }
 
   async initBackground() {
@@ -492,8 +522,12 @@ export class GameComponent implements OnInit {
     });
   }
 
-  private generatePeerId(): string {
-    const randomNum = Math.floor(100000 + Math.random() * 900000); // Generate 6-digit number
-    return `GP-${randomNum}`;
+
+  ngOnDestroy() {
+    this.app!.destroy(true, {
+      children: true,
+      texture: true,
+    });
+    this.app = null;
   }
 }
