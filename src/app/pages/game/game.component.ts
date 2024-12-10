@@ -98,9 +98,9 @@ export class GameComponent implements OnInit, OnDestroy {
   private readonly OFFSCREEN_MARGIN = 100; // How far past the screen edge before removing
 
   configureAssets() {
-    Assets.add({ alias: 'background', src: `/grenadepong/background${this.gameService.getRandomBackgroundIndex()}.jpeg` });
-    Assets.add({ alias: 'explosion', src: '/grenadepong/bexplosion.png' });
-    Assets.add({ alias: 'grenade', src: '/ggrenadepong/brenade.png' });
+    Assets.add({ alias: 'background', src: `grenadepong/background${this.gameService.getRandomBackgroundIndex()}.jpeg` });
+    Assets.add({ alias: 'explosion', src: 'grenadepong/explosion.png' });
+    Assets.add({ alias: 'grenade', src: 'ggrenadepong/grenade.png' });
   }
 
   async loadTextures() {
