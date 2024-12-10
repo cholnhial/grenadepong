@@ -32,4 +32,4 @@ jobs:
       - name: Deploy to GitHub Pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ng deploy --repo=https://github.com/cholnhial/grenadepong.git --name="Chol Nhial" --email=chol.nhial.chol@gmail.com
+        run: npx angular-cli-ghpages --repo=https://github.com/cholnhial/grenadepong.git --dir=dist/browser --name="Chol Nhial" --email=chol.nhial.chol@gmail.com
