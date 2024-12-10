@@ -1,0 +1,21 @@
+<div class="container">
+  <app-card>
+    <div class="score">
+      @switch (scoreStatus) {
+        @case (ScoreStatus.WIN) {
+          <h3>You Win</h3>
+        }
+        @case (ScoreStatus.LOSE) {
+          <h3>{{otherPlayerName}} won!</h3>
+        }
+        @case (ScoreStatus.DRAW) {
+          <h3>It's a draw!</h3>
+        }
+      }
+      @if (isHost) {
+        <app-button (click)="onPlayAgain()" color="primary">Play again!</app-button>
+      }
+    </div>
+  </app-card>
+
+</div>
