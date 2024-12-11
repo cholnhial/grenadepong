@@ -6,6 +6,7 @@ import {GameService} from '../../services/game.service';
 import {generatePeerId} from '../../utils';
 import {GameMessage} from '../../models/game-message';
 import {PlayerMode} from '../../models/player';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-start',
@@ -28,4 +29,6 @@ export class StartComponent {
   async onGitHub() {
     await this.router.navigate(['/name']);
   }
+
+  protected readonly environment = environment;
 }

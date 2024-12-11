@@ -6,6 +6,7 @@ import {ButtonComponent} from '../../components/button/button.component';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GameService } from '../../services/game.service';
 import {PlayerMode} from '../../models/player';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-name',
@@ -45,4 +46,6 @@ export class NameComponent implements OnInit {
     }
 
   }
+
+  protected readonly environment = environment;
 }

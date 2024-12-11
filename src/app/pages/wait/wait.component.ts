@@ -9,6 +9,7 @@ import {Router} from '@angular/router';
 import {GameService} from '../../services/game.service';
 import {GameMessage, GameMessageType} from '../../models/game-message';
 import {PlayerMode} from '../../models/player';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-wait',
@@ -35,7 +36,7 @@ export class WaitComponent implements OnInit {
       this.peerService.init(peerId!);
 
       const backgroundIndex = this.gameService.getRandomBackgroundIndex();
-      const url = `https://cholnhial.github.io/grenadepong/#name?host-peer-id=${peerId}&background-index=${backgroundIndex}`;
+      const url = `${environment.appBaseUrl}/grenadepong/#name?host-peer-id=${peerId}&background-index=${backgroundIndex}`;
       this.qrCodeBase64$ = this.qrCodeService.generateQrCode(url);
       console.log(url);
       this.peerService.getOnDataSubject().subscribe((data: GameMessage) => {
@@ -47,4 +48,5 @@ export class WaitComponent implements OnInit {
     }
   }
 
+  protected readonly environment = environment;
 }

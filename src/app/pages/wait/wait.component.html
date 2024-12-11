@@ -1,6 +1,6 @@
 <div class="container">
   <div class="logo-container">
-    <img src="/grenadepong/logo.png" alt="Logo" class="logo">
+    <img [src]="!environment.production ? 'logo.png' : '/grenadepong/logo.png'" alt="Logo" class="logo">
   </div>
   <div class="qr-code">
     <img [src]="(qrCodeBase64$ | async) ?? ''" />

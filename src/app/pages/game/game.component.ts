@@ -92,7 +92,7 @@ export class GameComponent implements OnInit, OnDestroy {
   private readonly GRAVITY = 0.2;
   private readonly MIN_VELOCITY = 0.1;
   private readonly HISTORY_POINTS = 5;
-  private readonly FLICK_MULTIPLIER = 0.009;
+  private readonly FLICK_MULTIPLIER = 0.05; // 0.009
 
   // Screen boundaries
   private readonly OFFSCREEN_MARGIN = 100; // How far past the screen edge before removing
