@@ -11,58 +11,6 @@ import {TimerComponent} from '../../components/timer/timer.component';
 import {TimerService} from '../../services/timer.service';
 import {Router} from '@angular/router';
 
-/***
-
-
- - 4 animations of explosions.
-
- - Each Animation Atlas frame is a 512 x 512 size image (4096 x 4096 total). Included half sized version as well (2048 x 2048 total).
-
-
- - Both grenades explode on one screen => GAME OVER
- - a player has one grenade explode
- PROTOCOL:
-
-
-
- BALL LEAVES SCREEN:
- This scenario allows us to repaint the ball on the other players screen.
- This message may be sent by either player.
- The remove the ball as it leaves the screen.
-
- device will acknowledge that they don't have the grenade.
- They'll be waiting for
- - EXPLOSION
- - GAME_OVER
-
- type: GRENADE_INCOMING
- payload: {
- last known grenade coordinates,
- this players screen width and height
- }
-
- Host sends this message to the other player for them to begin their countdown
- initially after joining the game.
-
- type: START_TIMER
- payload: { }
-
-
-
- SCENARIO: HAS ALL GRENADE
-
- If a grenade exploded on our screen send this to other player
- type: EXPLOSION
- payload: {}
-
- If the timer counted down and we have all the grenade we sent this
- type: GAME_OVER
- payload: {
- winner: Our name
- }
- **/
-
-
 
 
 @Component({
@@ -76,7 +24,6 @@ export class GameComponent implements OnInit, OnDestroy {
   constructor(private peerService: PeerService,
               private timerService: TimerService,
               private router: Router,
-              private renderer: Renderer2,
               private gameService: GameService) {
   }
   private readonly gameCanvas = viewChild<ElementRef>('gameCanvas');
