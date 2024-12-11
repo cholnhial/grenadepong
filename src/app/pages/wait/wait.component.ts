@@ -48,5 +48,13 @@ export class WaitComponent implements OnInit {
     }
   }
 
+  async onEndGame() {
+    await this.router.navigate(['start']);
+  }
+
+  get joinId() {
+    return this.joiningId?.replace('GP-', '') + this.gameService.getRandomBackgroundIndex().toString();
+  }
+
   protected readonly environment = environment;
 }

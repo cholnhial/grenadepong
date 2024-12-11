@@ -4,6 +4,7 @@ import {NameComponent} from './pages/name/name.component';
 import {GameComponent} from './pages/game/game.component';
 import {WaitComponent} from './pages/wait/wait.component';
 import {ScoreComponent} from './pages/score/score.component';
+import {JoinComponent} from './pages/join/join.component';
 
 export const routes: Routes = [
   { path: '',   redirectTo: '/start', pathMatch: 'full' },
@@ -11,5 +12,6 @@ export const routes: Routes = [
   { path: 'name', component: NameComponent },
   { path: 'game', component:  GameComponent},
   { path: 'wait', component:  WaitComponent},
-  { path: 'score', component:  ScoreComponent}
+  { path: 'score', component:  ScoreComponent},
+  { path: 'join', component:  JoinComponent}
 ];

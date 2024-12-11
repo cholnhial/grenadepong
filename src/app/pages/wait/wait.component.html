@@ -5,6 +5,6 @@
   <div class="qr-code">
     <img [src]="(qrCodeBase64$ | async) ?? ''" />
   </div>
-  <p class="text help-text text-primary">Get the other player to scan the QR to join your game {{ joiningId }}</p>
-  <app-button color="danger">END GAME</app-button>
+  <p class="text help-text">Get the other player to scan the QR to join your game or by entering <strong>{{ joinId }}</strong></p>
+  <app-button (click)="onEndGame()" color="danger">END GAME</app-button>
 </div>

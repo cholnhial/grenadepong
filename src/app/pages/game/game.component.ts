@@ -36,10 +36,10 @@ export class GameComponent implements OnInit, OnDestroy {
   // Physics constants
   private readonly FRICTION = 0.90;
   private readonly BOUNCE_DAMPING = 0.7;
-  private readonly GRAVITY = 0.2;
+  private readonly GRAVITY = 0.8;
   private readonly MIN_VELOCITY = 0.1;
-  private readonly HISTORY_POINTS = 5;
-  private readonly FLICK_MULTIPLIER = 0.05; // 0.009
+  private readonly HISTORY_POINTS = 3;
+  private readonly FLICK_MULTIPLIER = 0.04; // 0.009
 
   // Screen boundaries
   private readonly OFFSCREEN_MARGIN = 100; // How far past the screen edge before removing
@@ -450,7 +450,7 @@ export class GameComponent implements OnInit, OnDestroy {
     grenade.anchor.set(0.5);
     grenade.scale.set(0.3);
     grenade.zIndex = 3;
-    grenade.x = this.app!.screen.width / 2;
+    grenade.x = (this.app!.screen.width / 2) - ((grenade.width)+grenade.width/2);
     grenade.y = this.app!.screen.height / 3;
     grenade.eventMode = 'static';
     grenade.cursor = 'pointer';

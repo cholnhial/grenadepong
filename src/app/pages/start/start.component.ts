@@ -26,8 +26,8 @@ export class StartComponent {
     await this.router.navigate(['/name']);
   }
 
-  async onGitHub() {
-    await this.router.navigate(['/name']);
+  async onJoin() {
+    await this.router.navigate(['/join']);
   }
 
   protected readonly environment = environment;

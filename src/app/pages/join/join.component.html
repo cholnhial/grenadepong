@@ -1,0 +1,12 @@
+<div class="container">
+  <div class="logo-container">
+    <img [src]="!environment.production ? 'logo.png' : '/grenadepong/logo.png'" alt="Logo" class="logo">
+  </div>
+  <app-card>
+    <p class="help-text">Join with the code provided by the host</p>
+    <form #joinForm=ngForm (ngSubmit)="onSubmit()">
+      <input class="number" name="name" [(ngModel)]="joinId" required placeholder="1234567" />
+      <app-button [disabled]="!joinForm.valid" color="primary">Join</app-button>
+    </form>
+  </app-card>
+</div>

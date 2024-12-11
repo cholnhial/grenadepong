@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import Peer, {DataConnection} from 'peerjs';
 import {EMPTY, Observable, Subject} from 'rxjs';
-
+import { environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -30,9 +30,8 @@ export class PeerService {
    * @param isHost whether to start in host mode
    */
   init(peerId: string, hostPeerId: string | null = null, isHost = true) {
-    this.peer = new Peer(peerId,{
-      debug: 3, // Verbose logs
-    });
+    const options = environment.production ? {} : { debug: 3};
+    this.peer = new Peer(peerId, options);
 
     if (isHost) {
       this.isInitAsHost = true;
