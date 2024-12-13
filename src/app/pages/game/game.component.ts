@@ -333,9 +333,10 @@ export class GameComponent implements OnInit, OnDestroy {
         }
 
         // Apply friction
-        g.velocity.x *= this.FRICTION;
-        g.velocity.y *= this.FRICTION;
-
+        if (!g.isDragging) {
+          g.velocity.x *= this.FRICTION;
+          g.velocity.y *= this.FRICTION;
+        }
         // Stop moving if velocity is very low
         if (Math.abs(g.velocity.x) < this.MIN_VELOCITY) g.velocity.x = 0;
         if (Math.abs(g.velocity.y) < this.MIN_VELOCITY) g.velocity.y = 0;
