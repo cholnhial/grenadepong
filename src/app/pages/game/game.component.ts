@@ -10,7 +10,7 @@ import {PlayerMode, ScoreStatus} from '../../models/player';
 import {TimerComponent} from '../../components/timer/timer.component';
 import {TimerService} from '../../services/timer.service';
 import {Router} from '@angular/router';
-
+import { Howl } from 'howler';
 
 
 @Component({
@@ -31,6 +31,7 @@ export class GameComponent implements OnInit, OnDestroy {
   private grenades: Array<Grenade> = [];
   private grenadeTexture!: PIXI.Texture;
   private explosionAnimationTexture!: PIXI.Texture;
+  private explosionSound!: any;
   private isHost = false;
 
   // Physics constants
@@ -45,6 +46,7 @@ export class GameComponent implements OnInit, OnDestroy {
   private readonly OFFSCREEN_MARGIN = 100; // How far past the screen edge before removing
 
   configureAssets() {
+    // Graphics
     Assets.add({ alias: 'background', src: `background${this.gameService.getRandomBackgroundIndex()}.jpeg` });
     Assets.add({ alias: 'explosion', src: 'explosion.png' });
     Assets.add({ alias: 'grenade', src: 'grenade.png' });
@@ -55,6 +57,15 @@ export class GameComponent implements OnInit, OnDestroy {
     this.explosionAnimationTexture = await  Assets.load('explosion');
   }
 
+  public loadExplosionSound(soundPath: string): void {
+    this.explosionSound = new Howl({
+      src: [soundPath]
+    });
+  }
+
+  public playExplosionSound(): void {
+    this.explosionSound?.play();
+  }
   getExplosionAnimationSpriteSheetData() {
 
     const spriteSheetData:PIXI.SpritesheetData = {
@@ -124,6 +135,7 @@ export class GameComponent implements OnInit, OnDestroy {
       this.app!.stage.removeChild(grenade.explosionAnimation);
     }
     this.app!.stage.addChild(grenade.explosionAnimation);
+    this.playExplosionSound();
   }
 
   async ngOnInit() {
@@ -140,6 +152,7 @@ export class GameComponent implements OnInit, OnDestroy {
       this.gameCanvas()?.nativeElement?.appendChild(this.app.canvas);
       this.configureAssets();
       await this.loadTextures();
+      this.loadExplosionSound('explosion.wav');
       await this.initBackground();
 
       this.app.ticker.add(this.gameLoop.bind(this));
