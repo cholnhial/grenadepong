@@ -3,7 +3,7 @@
 [DEMO](https://cholnhial.github.io/grenadepong)
 
 ## 🌟 Overview
-![Game](./screenshots/highlight.gif)
+<img src="./screenshots/highlight.gif" alt="Game" width="375" height="812">
 
 Grenadepong is a unique twist on the classic 2D pong game where your fingers become the paddles. Play with a friend either in close proximity or across the internet. I recommend playing on mobile for the best experience - just have your friends scan the QR code or join via a shared code!
 
@@ -11,7 +11,7 @@ Grenadepong is a unique twist on the classic 2D pong game where your fingers bec
 
 I created this game primarily for fun and as a learning experience. By leveraging modern web technologies, I demonstrated how multiplayer web games can be developed with minimal backend infrastructure.
 
-#### 🛠 Tech Stack
+#### 🚰 Tech Stack
 - Angular
 - PixiJS (2D game engine)
 - PeerJS (WebRTC implementation for multiplayer functionality)
@@ -28,7 +28,7 @@ Interestingly, much of the game's physics were developed with AI assistance from
 
 One of the most innovative features I've created in Grenadepong is the incredibly smooth ball transition across players' screens. By leveraging PeerJS, I've developed a multiplayer experience where the ball seems to pass through screens as if they were one continuous surface.
 
-![Seamless Screen Transition GIF](./screenshots/continuous-screen.gif)
+<img src="./screenshots/continuous-screen.gif" alt="Seamless Screen Transition GIF" width="375" height="812">
 
 #### 🔮 How I Made It Work
 When the ball reaches the edge of one player's screen, here's what happens:
@@ -50,7 +50,7 @@ The result is a multiplayer experience so smooth, it feels like you're playing o
 ### 1. 🌐 Multiplayer Mayhem
 Play with friends over the internet - distance is no obstacle!
 
-![Multiplayer Support](./screenshots/1.png)
+<img src="./screenshots/1.png" alt="Multiplayer Support" width="375" height="812">
 
 ### 2. ⏱️ Explosive Time Limit
 - 30-second countdown before grenades detonate
@@ -60,13 +60,12 @@ Play with friends over the internet - distance is no obstacle!
   - Only one grenade explodes? It's a draw!
 - Winning triggers a spectacular confetti celebration (thanks to `canvas-confetti`)!
 
-
-![Gameplay Play 1](./screenshots/confetti.gif)
+<img src="./screenshots/confetti.gif" alt="Gameplay Play 1" width="375" height="812">
 
 ### 3. 🔁 Endless Excitement
 The host can restart the game infinitely - the fun never stops!
 
-![Play Again](./screenshots/2.png)
+<img src="./screenshots/2.png" alt="Play Again" width="375" height="812">
 
 ## 🖥️ Development
 
@@ -100,7 +99,7 @@ ng deploy --base-href=/grenadepong/
 
 Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](your-repo-issues-link).
 
-## 📜 License
+## 🐜 License
 
 MIT
 
@@ -113,3 +112,4 @@ MIT
 ---
 
 **Happy Gaming! 🎮🔫**
+
