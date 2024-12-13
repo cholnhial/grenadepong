@@ -1,59 +1,115 @@
-# Grenadepong
+# Grenadepong 🎮💥
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.1.
+[DEMO](https://cholnhial.github.io/grenadepong)
 
-## Development server
+## 🌟 Overview
+![Game](./screenshots/highlight.gif)
 
-To start a local development server, run:
+Grenadepong is a unique twist on the classic 2D pong game where your fingers become the paddles. Play with a friend either in close proximity or across the internet. I recommend playing on mobile for the best experience - just have your friends scan the QR code or join via a shared code!
 
+### 🚀 Motivation
+
+I created this game primarily for fun and as a learning experience. By leveraging modern web technologies, I demonstrated how multiplayer web games can be developed with minimal backend infrastructure.
+
+#### 🛠 Tech Stack
+- Angular
+- PixiJS (2D game engine)
+- PeerJS (WebRTC implementation for multiplayer functionality)
+
+During development, I discovered an exciting possibility: creating multiplayer web games that rely solely on communication without needing a traditional backend.
+
+**Note**: Game assets (grenades, background, explosion audio) are sourced from free asset sites. I didn't create these graphics or sounds myself.
+
+Interestingly, much of the game's physics were developed with AI assistance from Claude and ChatGPT. My primary focus was on the communication aspects and asset selection. While the game might seem barebones, it showcases how AI can dramatically accelerate development when you have a clear vision.
+
+### 🌉 Seamless Cross-Screen Gameplay
+
+#### 🚀 Breakthrough Multiplayer Mechanics
+
+One of the most innovative features I've created in Grenadepong is the incredibly smooth ball transition across players' screens. By leveraging PeerJS, I've developed a multiplayer experience where the ball seems to pass through screens as if they were one continuous surface.
+
+![Seamless Screen Transition GIF](./screenshots/continuous-screen.gif)
+
+#### 🔮 How I Made It Work
+When the ball reaches the edge of one player's screen, here's what happens:
+- Precise coordinates of the ball are instantly transmitted
+- I calculate the exact position, velocity, and trajectory
+- The receiving screen perfectly continues the ball's movement
+- There's no visual interruption or lag - it's like the screens are magically connected
+
+#### 🌐 WebRTC Magic
+This feature showcases why I chose to use WebRTC (Web Real-Time Communication):
+- Direct peer-to-peer connection
+- Minimal latency
+- Real-time data synchronization
+- No central server required
+
+The result is a multiplayer experience so smooth, it feels like you're playing on a single, extended screen. I used PeerJS to handle the complex real-time data transmission that makes such seamless interaction possible. It was a challenging but incredibly satisfying feature to implement!
+## ✨ Features
+
+### 1. 🌐 Multiplayer Mayhem
+Play with friends over the internet - distance is no obstacle!
+
+![Multiplayer Support](./screenshots/1.png)
+
+### 2. ⏱️ Explosive Time Limit
+- 30-second countdown before grenades detonate
+- Win Conditions:
+  - Both grenades explode on your screen? You lose!
+  - No grenades explode? You win!
+  - Only one grenade explodes? It's a draw!
+- Winning triggers a spectacular confetti celebration (thanks to `canvas-confetti`)!
+
+
+![Gameplay Play 1](./screenshots/confetti.gif)
+
+### 3. 🔁 Endless Excitement
+The host can restart the game infinitely - the fun never stops!
+
+![Play Again](./screenshots/2.png)
+
+## 🖥️ Development
+
+Want to make the game your own? Here's how:
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   ng serve --host 0.0.0.0
+   ```
+
+4. In the console, you'll see your IP. Modify `src/environments/environment.development.ts`
+
+5. If your mobile is on the same network, scan the QR code to join
+
+### 🚀 Deployment
+Deploy to GitHub Pages with:
 ```bash
-ng serve
+ng deploy --base-href=/grenadepong/
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+**Requirements**:
+- Node.js version 18 or higher
 
-## Code scaffolding
+## 📋 Contributing
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](your-repo-issues-link).
 
-```bash
-ng generate component component-name
-```
+## 📜 License
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+MIT
 
-```bash
-ng generate --help
-```
+## 🙌 Acknowledgments
 
-## Building
+- Special thanks to AI assistants for helping with physics implementation
+- Free asset sites for game graphics and sounds
+- The open-source community
 
-To build the project run:
+---
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+**Happy Gaming! 🎮🔫**
